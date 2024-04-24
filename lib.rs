@@ -1,6 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
-use pop_api::nfts;
 use pop_api::nfts::*;
 use enumflags2::BitFlags;
 
@@ -8,11 +7,11 @@ use enumflags2::BitFlags;
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum ContractError {
 	InvalidCollection,
-	NftsError(nfts::Error),
+	NftsError(Error),
 }
 
-impl From<nfts::Error> for ContractError {
-	fn from(value: nfts::Error) -> Self {
+impl From<Error> for ContractError {
+	fn from(value: Error) -> Self {
 		ContractError::NftsError(value)
 	}
 }
@@ -47,14 +46,7 @@ mod my_nft {
 
         #[ink(message)]
 		pub fn create_nft_collection( &self ) -> Result<(), ContractError>{
-			// create collection api
-			// pop_api::nfts::mint(collection_id, item_id, receiver)?;
-            // let the admin be the caller
             let admin = Self::env().caller();
-            // create a MintSetting with mint_type, price, start_block, end_block, default_item_settings
-            use pop_api::nfts::ItemSetting;
-
-            // Return an ItemSettings with an ItemSetting with the Transferable flag
             let item_settings = ItemSettings(BitFlags::from(ItemSetting::Transferable));
 
             let mint_settings = MintSettings {
@@ -65,14 +57,14 @@ mod my_nft {
                 default_item_settings: item_settings,
             };
 
-            // create a CollectionConfig with everything enabled
             let config = CollectionConfig {
                 settings: CollectionSettings(BitFlags::from(CollectionSetting::TransferableItems)),  
                 max_supply: None,
                 mint_settings,
             };
             pop_api::nfts::create(admin, config)?;
-			ink::env::debug_println!("Contract::create_nft_collection: collection created successfully");
+			// ink::env::debug_println!("Contract::create_nft_collection: collection created successfully");
+			// pop_api::nfts::mint(collection_id, item_id, receiver)?;
             Ok(())
 		}
     }
