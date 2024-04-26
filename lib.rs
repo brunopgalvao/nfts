@@ -31,7 +31,7 @@ mod my_nfts {
 		}
 
 		#[ink(message)]
-		pub fn create_nft_collection( &self ) -> Result<(), ContractError>{
+		pub fn create_nft_collection( &mut self ) -> Result<(), ContractError>{
 			ink::env::debug_println!("Nfts::create_nft_collection: collection creation started.");
             let admin = Self::env().caller();
             let item_settings = ItemSettings(BitFlags::from(ItemSetting::Transferable));
