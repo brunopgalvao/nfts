@@ -5,34 +5,34 @@ use pop_api::nfts::*;
 #[derive(Debug, Copy, Clone, PartialEq, Eq, scale::Encode, scale::Decode)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
 pub enum ContractError {
-	InvalidCollection,
-	NftsError(Error),
+    InvalidCollection,
+    NftsError(Error),
 }
 
 impl From<Error> for ContractError {
-	fn from(value: Error) -> Self {
-		ContractError::NftsError(value)
-	}
+    fn from(value: Error) -> Self {
+        ContractError::NftsError(value)
+    }
 }
 
 #[ink::contract]
-mod my_nfts {
+mod nfts {
     use super::*;
 
-	#[ink(storage)]
-	#[derive(Default)]
-	pub struct MyNfts;
+    #[ink(storage)]
+    #[derive(Default)]
+    pub struct NFTs;
 
-    impl MyNfts {
-		#[ink(constructor, payable)]
-		pub fn new() -> Self {
-			ink::env::debug_println!("Nfts::new");
-			Default::default()
-		}
+    impl NFTs {
+        #[ink(constructor, payable)]
+        pub fn new() -> Self {
+            ink::env::debug_println!("Nfts::new");
+            Default::default()
+        }
 
-		#[ink(message)]
-		pub fn create_nft_collection( &mut self ) -> Result<(), ContractError>{
-			ink::env::debug_println!("Nfts::create_nft_collection: collection creation started.");
+        #[ink(message)]
+        pub fn create_nft_collection(&mut self) -> Result<(), ContractError> {
+            ink::env::debug_println!("Nfts::create_nft_collection: collection creation started.");
             let admin = Self::env().caller();
             let item_settings = ItemSettings(BitFlags::from(ItemSetting::Transferable));
 
@@ -45,31 +45,34 @@ mod my_nfts {
             };
 
             let config = CollectionConfig {
-                settings: CollectionSettings(BitFlags::from(CollectionSetting::TransferableItems)),  
+                settings: CollectionSettings(BitFlags::from(CollectionSetting::TransferableItems)),
                 max_supply: None,
                 mint_settings,
             };
             pop_api::nfts::create(admin, config)?;
-			ink::env::debug_println!("Nfts::create_nft_collection: collection created successfully.");
+            ink::env::debug_println!(
+                "Nfts::create_nft_collection: collection created successfully."
+            );
             Ok(())
-		}
+        }
 
         #[ink(message)]
-		pub fn read_collection(&self, collection_id: u32) -> Result<(), ContractError> {
-			ink::env::debug_println!("Nfts::read_collection: collection_id: {:?}", collection_id);
-			let collection = pop_api::nfts::collection(collection_id)?.ok_or(ContractError::InvalidCollection)?;
-			ink::env::debug_println!("Nfts::read_collection: collection: {:?}", collection);
+        pub fn read_collection(&self, collection_id: u32) -> Result<(), ContractError> {
+            ink::env::debug_println!("Nfts::read_collection: collection_id: {:?}", collection_id);
+            let collection = pop_api::nfts::collection(collection_id)?
+                .ok_or(ContractError::InvalidCollection)?;
+            ink::env::debug_println!("Nfts::read_collection: collection: {:?}", collection);
             Ok(())
-		}
+        }
     }
 
     #[cfg(test)]
-	mod tests {
-		use super::*;
+    mod tests {
+        use super::*;
 
-		#[ink::test]
-		fn default_works() {
-			MyNfts::new();
-		}
-	}
+        #[ink::test]
+        fn default_works() {
+            NFTs::new();
+        }
+    }
 }
