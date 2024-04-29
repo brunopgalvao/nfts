@@ -1,1 +1,1 @@
-# my_nft
+# NFTs Example ink! Smart Contract using Pop API
