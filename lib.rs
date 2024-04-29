@@ -53,6 +53,14 @@ mod my_nfts {
 			ink::env::debug_println!("Nfts::create_nft_collection: collection created successfully.");
             Ok(())
 		}
+
+        #[ink(message)]
+		pub fn read_collection(&self, collection_id: u32) -> Result<(), ContractError> {
+			ink::env::debug_println!("Nfts::read_collection: collection_id: {:?}", collection_id);
+			let collection = pop_api::nfts::collection(collection_id)?.ok_or(ContractError::InvalidCollection)?;
+			ink::env::debug_println!("Nfts::read_collection: collection: {:?}", collection);
+            Ok(())
+		}
     }
 
     #[cfg(test)]
